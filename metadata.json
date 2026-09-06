@@ -1,0 +1,6 @@
+{
+  "name": "Gemini Journal & Reflections",
+  "description": "A secure, user-authenticated reflection and journaling assistant powered by Gemini 3.6 Flash and Cloud Firestore with owner-isolated persistence.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

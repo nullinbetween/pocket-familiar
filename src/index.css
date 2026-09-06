@@ -1,0 +1,223 @@
+@import "tailwindcss";
+
+@layer base {
+  html, body, #root {
+    width: 100%;
+    min-height: 100%;
+  }
+  body {
+    margin: 0;
+    overflow-x: hidden;
+    background-color: #FDFCF7;
+    color: #38382E;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  #root { overflow-x: clip; }
+  *, *::before, *::after { box-sizing: border-box; }
+}
+
+/* ── PF-02: familiar micro-motion — purposeful only, and ONLY when the user
+   has not asked for reduced motion. The static state is fully readable. ── */
+@media (prefers-reduced-motion: no-preference) {
+  .familiar-breathe { animation: familiar-breathe 4.5s ease-in-out infinite; transform-origin: 50% 70%; }
+  .familiar-lean { rotate: -2deg; transition: rotate 0.4s ease; }
+  .familiar-settle { animation: familiar-settle 2.8s ease-in-out infinite; }
+  .familiar-perk { animation: familiar-perk 0.5s ease-out 1; transform-origin: 50% 80%; }
+  .familiar-spark-once { animation: familiar-spark-once 0.9s ease-out 1; }
+  .familiar-blink { animation: familiar-blink 6s step-end infinite; transform-origin: 50% 47%; }
+  .familiar-dots circle { animation: familiar-dot 1.6s ease-in-out infinite; }
+  .familiar-dots circle:nth-child(2) { animation-delay: 0.25s; }
+  .familiar-dots circle:nth-child(3) { animation-delay: 0.5s; }
+}
+
+@keyframes familiar-breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.025); } }
+@keyframes familiar-settle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(1.5px); } }
+@keyframes familiar-perk { 0% { transform: scale(0.96); } 60% { transform: scale(1.04); } 100% { transform: scale(1); } }
+@keyframes familiar-spark-once { 0% { opacity: 0; transform: scale(0.6); } 40% { opacity: 1; transform: scale(1.15); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes familiar-blink { 0%, 92%, 100% { transform: scaleY(1); } 94%, 96% { transform: scaleY(0.1); } }
+@keyframes familiar-dot { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }
+
+/* ── Pocket Familiar skin tokens — nocturnal garden, warm paper ───────────── */
+:root {
+  --pf-ink: #10151F;          /* ink-black / deep navy */
+  --pf-night-1: #141C2B;      /* twilight top */
+  --pf-night-2: #1E2A38;      /* twilight mid */
+  --pf-night-3: #26323A;      /* twilight low (moss shadow) */
+  --pf-forest: #55604B;       /* muted forest green */
+  --pf-forest-deep: #3B4535;
+  --pf-moss: #7C8A6A;
+  --pf-moon: #8FB0C9;         /* moonlit blue */
+  --pf-moon-deep: #5E7E99;
+  --pf-paper: #FBF6EA;        /* warm paper */
+  --pf-paper-2: #F4ECD9;
+  --pf-brass: #C2A25E;        /* brass / gold */
+  --pf-brass-soft: #D8BE86;
+  --pf-ink-soft: #2C333B;
+  --pf-cream: #FDFCF7;
+}
+
+/* Warm paper journal surface */
+.pf-paper-surface {
+  background:
+    radial-gradient(120% 140% at 0% 0%, rgba(255,255,255,0.55), transparent 55%),
+    linear-gradient(180deg, var(--pf-paper) 0%, var(--pf-paper-2) 100%);
+}
+
+/* Nocturnal garden atmosphere (landing + signed-in hero band) */
+.pf-night {
+  background:
+    radial-gradient(90% 70% at 78% 18%, rgba(143,176,201,0.20), transparent 60%),
+    radial-gradient(70% 60% at 12% 90%, rgba(124,138,106,0.22), transparent 60%),
+    linear-gradient(165deg, var(--pf-night-1) 0%, var(--pf-night-2) 52%, var(--pf-night-3) 100%);
+}
+.pf-night-veil {
+  background: linear-gradient(180deg, rgba(16,21,31,0) 0%, rgba(16,21,31,0.55) 100%);
+}
+
+/* Brass hairline + soft glass card used across the journal world */
+.pf-glass {
+  background: rgba(251,246,234,0.92);
+  border: 1px solid rgba(194,162,94,0.30);
+  backdrop-filter: blur(6px);
+}
+.pf-hairline { border-color: rgba(194,162,94,0.30); }
+
+/* Decorative star/leaf flecks — never required to read state, never block input */
+.pf-decor { pointer-events: none; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .pf-twinkle { animation: pf-twinkle 5.5s ease-in-out infinite; }
+  .pf-twinkle:nth-child(2) { animation-delay: 1.2s; }
+  .pf-twinkle:nth-child(3) { animation-delay: 2.4s; }
+  .pf-twinkle:nth-child(4) { animation-delay: 3.1s; }
+  .pf-float { animation: pf-float 9s ease-in-out infinite; }
+}
+@keyframes pf-twinkle { 0%, 100% { opacity: 0.25; } 50% { opacity: 0.9; } }
+@keyframes pf-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+/* ── Skin Round 1 rework — reference palette + journal-stage surfaces ──────── */
+:root {
+  --pf-lavender: #B9A9CE;
+  --pf-lavender-soft: #ECE6F2;
+  --pf-lavender-tint: #F4F0F8;
+  --pf-peach: #E0B583;
+  --pf-navy: #2C3A52;
+  --pf-navy-soft: #E7EDF3;
+  --pf-story-tint: #F1EEE1;
+}
+
+/* Shared signed-in page geometry. The content pane scrolls; the viewport never
+   drifts sideways. Journal/Familiar stay focused but no longer phone-sized on desktop. */
+.pf-page {
+  width: 100%;
+  max-width: 72rem;
+  margin-inline: auto;
+}
+.pf-page-frame {
+  padding: 1rem 0.75rem 1.5rem;
+}
+.pf-stage {
+  width: 100%;
+  max-width: 52rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Responsive app header: brand/actions stay visible; four destinations occupy
+   their own compact row on phones. No child is allowed to widen the page. */
+.pf-app-header { flex: none; width: 100%; }
+.pf-navbar {
+  width: 100%;
+  max-width: 80rem;
+  min-width: 0;
+  min-height: 3.75rem;
+  padding: 0.625rem 1rem;
+  display: grid;
+  grid-template-columns: minmax(12rem, 1fr) auto minmax(12rem, 1fr);
+  align-items: center;
+  gap: 0.75rem;
+}
+.pf-navbar-brand { justify-self: start; }
+.pf-navbar-tabs { display: flex; align-items: center; justify-self: center; min-width: 0; }
+.pf-navbar-actions { justify-self: end; }
+
+@media (max-width: 767px) {
+  .pf-navbar {
+    min-height: auto;
+    padding: 0.5rem 0.75rem 0.45rem;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.45rem 0.5rem;
+  }
+  .pf-navbar-brand span { font-size: 0.95rem; }
+  .pf-navbar-tabs {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.15rem;
+  }
+  .pf-navbar-tab {
+    min-width: 0;
+    padding: 0.42rem 0.2rem;
+    gap: 0.25rem;
+    font-size: 0.68rem;
+  }
+  .pf-navbar-tab svg { width: 0.78rem; height: 0.78rem; flex: none; }
+  .pf-nav-count { padding-inline: 0.22rem; font-size: 0.56rem; }
+  .pf-security-label { display: none; }
+  .pf-security-button { width: 2.25rem; padding-inline: 0; }
+  .pf-page-frame { padding: 0.9rem 0.75rem 1.5rem; }
+}
+
+@media (min-width: 768px) {
+  .pf-page-frame { padding: 1.5rem 1.5rem 2rem; }
+}
+
+/* Deep garden-study card behind the writing sheet */
+.pf-garden {
+  background:
+    radial-gradient(120% 90% at 70% 10%, rgba(143,176,201,0.28), transparent 60%),
+    radial-gradient(90% 80% at 10% 100%, rgba(124,138,106,0.30), transparent 60%),
+    linear-gradient(170deg, #1c2735 0%, #243027 60%, #2b3524 100%);
+}
+
+/* Writing sheet edge — a soft torn-paper rise */
+.pf-sheet {
+  background: linear-gradient(180deg, var(--pf-paper) 0%, var(--pf-paper-2) 100%);
+  box-shadow: 0 -10px 30px rgba(16,21,31,0.12);
+}
+
+/* Provenance column families for the memory library */
+.pf-prov-story { background: linear-gradient(180deg, #F5F2E6, var(--pf-story-tint)); border-color: rgba(124,138,106,0.35); }
+.pf-prov-told  { background: linear-gradient(180deg, var(--pf-lavender-tint), var(--pf-lavender-soft)); border-color: rgba(185,169,206,0.5); }
+.pf-prov-thought { background: linear-gradient(180deg, #EEF3F8, var(--pf-navy-soft)); border-color: rgba(94,126,153,0.4); }
+
+/* ── Memory library — three continuous provenance columns ─────────────────── */
+.pf-col { position: relative; overflow: hidden; isolation: isolate; }
+.pf-col-story   { background: linear-gradient(180deg, #EAF0E1 0%, #DCE6CE 55%, #CBD9B8 100%); }
+.pf-col-told    { background: linear-gradient(180deg, #F1ECF6 0%, #E7DEF0 55%, #DACFEA 100%); }
+.pf-col-thought { background: linear-gradient(180deg, #E7EDF4 0%, #D8E2EE 55%, #C6D3E4 100%); }
+/* Two-layer column composition: accepted scene below, transparent familiar on top. */
+.pf-col-art { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.pf-col-background { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center bottom; opacity: 0.82; }
+.pf-col-art::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(253,252,247,0.62) 0%, rgba(253,252,247,0.16) 50%, rgba(16,21,31,0.10) 100%); }
+.pf-col-familiar { position: absolute; z-index: 1; left: 50%; bottom: 0.4rem; width: 78%; max-height: 12rem; transform: translateX(-50%); object-fit: contain; object-position: center bottom; filter: drop-shadow(0 8px 12px rgba(16,21,31,0.38)); }
+.pf-col > :not(.pf-col-art) { position: relative; z-index: 2; }
+/* General paper note, plus a more translucent Memory-column treatment so the
+   illustrated provenance scenes remain visible behind the slips. */
+.pf-note { background: rgba(253,252,247,0.96); }
+.pf-memory-columns .pf-note {
+  background: rgba(253,252,247,0.80);
+  backdrop-filter: blur(1.5px);
+}
+
+@media (max-width: 639px) {
+  .pf-memory-columns { gap: 0.35rem; }
+  .pf-col-familiar { width: 96%; max-height: 8.5rem; }
+}
+
+/* Journal stage: illustration and writing sheet joined as one surface */
+.pf-journal-stage { position: relative; }
+.pf-journal-scene { position: relative; }
+.pf-sheet-overlap { margin-top: -2.75rem; position: relative; z-index: 1; }

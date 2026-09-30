@@ -1,0 +1,20 @@
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+.fuse_hidden*
+firebase-debug.log
+firestore-debug.log
+*-debug.log
+
+# Withheld material must never be committed
+server/prompts/
+public/
+src/components/
+src/preview/
+preview/
+.DS_Store

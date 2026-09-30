@@ -1,0 +1,89 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    // PF-01.1 fix 4: canonical Diary Page shape enforced AT THE RULES BOUNDARY.
+    function validDiaryPage(userId, pageId) {
+      let d = request.resource.data;
+      return d.userId == userId
+        && d.kind == 'diaryPage'
+        && d.status == 'confirmed'
+        && d.aiAssisted == true
+        && d.id == pageId
+        && d.title is string && d.title.size() > 0 && d.title.size() <= 80
+        && d.date is string && d.date.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        && d.todayInMyWords is string && d.todayInMyWords.size() > 0 && d.todayInMyWords.size() <= 2000
+        && d.whatFeltImportant is list && d.whatFeltImportant.size() >= 1 && d.whatFeltImportant.size() <= 2
+        && d.sourceInteractionId is string && d.sourceInteractionId.size() > 0
+        && d.sourceTurnIds is list && d.sourceTurnIds.size() >= 1 && d.sourceTurnIds.size() <= 20
+        && d.createdAt is number
+        && d.confirmedAt is number
+        && d.editedByUser is bool;
+    }
+
+    // PF-CORE-01 closure: the ONLY profile a client may create is the fixed
+    // `profile` document, exactly Midnight + Companion, with no pre-set Keeper
+    // stage. Every later stage transition is a trusted server transaction.
+    function validNewCompanionProfile(userId) {
+      let d = request.resource.data;
+      return d.userId == userId
+        && d.kind == 'familiarProfile'
+        && d.id == 'profile'
+        && d.originId == 'midnight'
+        && d.stage == 'companion'
+        && d.createdAt is number
+        && !('stageActivatedAt' in d);
+    }
+
+    // Isolated user profile and settings
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+
+    // Isolated conversations (process)
+    match /users/{userId}/interactions/{interactionId} {
+      allow read, write: if isOwner(userId);
+    }
+
+    // Confirmed diary pages (result): owner-isolated, canonical shape on write.
+    // DELETE is server-only (source deletion cascades to memory seeds atomically),
+    // so a browser client may not delete a diary page directly.
+    match /users/{userId}/diaryPages/{pageId} {
+      allow read: if isOwner(userId);
+      allow create, update: if isOwner(userId) && validDiaryPage(userId, pageId);
+    }
+
+    // Memory seeds (growth evidence): owner may READ only. Creation, edit,
+    // revoke and delete are performed exclusively by authenticated server
+    // transactions (Admin SDK, which bypasses these rules). A browser client
+    // therefore cannot forge an "approved" seed, rewrite provenance/timestamps,
+    // or reactivate a revoked seed by direct write.
+    match /users/{userId}/memorySeeds/{seedId} {
+      allow read: if isOwner(userId);
+      // create, update, delete: denied to clients (no allow rule).
+    }
+
+    // PF-CORE-03A: Little Memories (approved scene briefs): owner may READ only.
+    // Creation, edit and delete are performed exclusively by authenticated server
+    // transactions (Admin SDK, which bypasses these rules). A browser client
+    // therefore cannot forge an approved brief, spoof provenance, or write an
+    // image/"generated" claim by direct write.
+    match /users/{userId}/littleMemories/{littleMemoryId} {
+      allow read: if isOwner(userId);
+      // create, update, delete: denied to clients (no allow rule).
+    }
+
+    // Familiar profile: only the fixed `profile` document may exist. The client
+    // may create it once as Midnight + Companion and read it. The Keeper stage
+    // transition and any deletion are server-only, so the client cannot set
+    // Keeper directly, downgrade, or delete-and-recreate to reset growth.
+    match /users/{userId}/familiar/profile {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && validNewCompanionProfile(userId);
+      // update, delete: denied to clients (server-only).
+    }
+  }
+}

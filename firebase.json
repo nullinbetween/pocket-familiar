@@ -1,0 +1,16 @@
+{
+  "firestore": [
+    {
+      "database": "YOUR_FIRESTORE_DATABASE_ID",
+      "rules": "firestore.rules"
+    }
+  ],
+  "emulators": {
+    "firestore": {
+      "port": 8089
+    },
+    "ui": {
+      "enabled": false
+    }
+  }
+}
